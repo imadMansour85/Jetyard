@@ -1,0 +1,13 @@
+# Keep secrets and local state out of the build context.
+**/.env
+**/.env.*.local
+trello.json
+.git
+
+# Build output and dependencies are rebuilt inside the image.
+**/node_modules
+frontend/.next
+frontend/out
+frontend/tsconfig.tsbuildinfo
+backend/jetyard
+license-server

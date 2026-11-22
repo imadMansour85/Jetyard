@@ -1,0 +1,42 @@
+# Jetyard against your existing NATS server, using the published image.
+#
+#   cp .env.example .env        # set JWT_SECRET, NATS_URL and NATS credentials
+#   docker compose -f docker-compose.prod.yml up -d
+#
+# HTTPS with Caddy (automatic Let's Encrypt certificate): set DOMAIN in .env,
+# point the domain's DNS at this host, open ports 80 and 443, then
+#   docker compose -f docker-compose.prod.yml --profile tls up -d
+# and set LISTEN=127.0.0.1:3000 so the plain-HTTP port isn't public.
+#
+# docker-compose.yml (no -f) is the development stack that also starts NATS.
+
+services:
+  jetyard:
+    image: ${JETYARD_IMAGE:-ghcr.io/imadmansour85/jetyard:latest}
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "${LISTEN:-3000}:3000"
+    volumes:
+      - jetyard-data:/data
+
+  caddy:
+    image: caddy:2
+    profiles: [tls]
+    restart: unless-stopped
+    depends_on:
+      - jetyard
+    environment:
+      DOMAIN: ${DOMAIN:-}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+
+volumes:
+  jetyard-data:
+  caddy-data:
+  caddy-config:

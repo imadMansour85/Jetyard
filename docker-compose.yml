@@ -1,0 +1,59 @@
+services:
+  nats:
+    image: nats:latest
+    container_name: nats-server
+    command: 
+      - "-js"
+      - "-m"
+      - "8222"
+    ports:
+      - "4222:4222"
+      - "8222:8222"
+    networks:
+      - nats-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: nats-backend
+    environment:
+      - NATS_URL=nats://nats:4222
+      - SERVER_PORT=8080
+      # Operator NKey seed for account/user management — set in .env, never commit it
+      - OPERATOR_NKEY_SEED=${OPERATOR_NKEY_SEED}
+      # Signs dashboard sessions; without it every restart logs everyone out
+      - JWT_SECRET=${JWT_SECRET}
+      # Optional — encrypts NATS account seeds at rest (openssl rand -base64 32)
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY:-}
+    ports:
+      - "8080:8080"
+    depends_on:
+      - nats
+    volumes:
+      - backend-data:/data
+    networks:
+      - nats-network
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: nats-frontend
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8080
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - nats-network
+    restart: unless-stopped
+
+networks:
+  nats-network:
+    driver: bridge
+
+volumes:
+  backend-data:

@@ -1,0 +1,71 @@
+name: Bug report
+description: Something doesn't work as documented
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting! For a security problem, don't open an issue: follow [SECURITY.md](https://github.com/imadMansour85/Jetyard/blob/main/SECURITY.md) instead.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you did, what you expected, and what happened instead. Include the request ID from the error message if there is one.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open Streams
+        2. Delete stream "orders"
+        3. ...
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Jetyard version
+      description: The version at the bottom of the sidebar, or the output of GET /version
+      placeholder: v0.1.0 · abc1234
+    validations:
+      required: true
+  - type: input
+    id: nats-version
+    attributes:
+      label: NATS server version
+      description: Shown on the Server Info page, or `nats-server --version`
+      placeholder: "2.10.22"
+    validations:
+      required: true
+  - type: dropdown
+    id: deploy
+    attributes:
+      label: How do you run it?
+      options:
+        - docker run (published image)
+        - docker-compose.prod.yml
+        - docker-compose.yml (development stack)
+        - Kubernetes
+        - Built from source
+        - Other
+    validations:
+      required: true
+  - type: dropdown
+    id: nats-auth
+    attributes:
+      label: NATS authentication
+      options:
+        - None
+        - User and password
+        - Token
+        - TLS / mTLS
+        - Operator / JWT (.creds)
+        - Other
+  - type: textarea
+    id: logs
+    attributes:
+      label: Backend logs
+      description: Relevant lines from the container logs. Remove anything secret first.
+      render: text

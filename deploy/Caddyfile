@@ -1,0 +1,17 @@
+# Used by docker-compose.prod.yml --profile tls. DOMAIN comes from .env.
+{$DOMAIN} {
+	reverse_proxy jetyard:3000
+
+	# The live-updates URL (/api/events) carries the session token in its
+	# query string; keep it out of the access log.
+	log {
+		format filter {
+			wrap console
+			fields {
+				request>uri query {
+					replace access_token REDACTED
+				}
+			}
+		}
+	}
+}

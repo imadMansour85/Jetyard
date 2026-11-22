@@ -1,0 +1,48 @@
+# Backend
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+dist/
+/backend/jetyard
+
+# Frontend
+node_modules/
+.next/
+out/
+.env
+.env*.local
+*.log
+
+# License server binary
+license-server/license-server
+
+# Trello export (local reference only)
+trello.json
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# TypeScript incremental build cache
+*.tsbuildinfo
+
+# AI assistant files: instructions, skills and local settings stay on your machine
+CLAUDE.md
+CLAUDE.local.md
+.claude/
+AGENTS.md
+SKILL.md
+skills/
+.cursor/
+.cursorrules
+.windsurfrules
+.github/copilot-instructions.md
+.aider*

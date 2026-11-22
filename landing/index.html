@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- PRODUCT NAME: "Jetyard" appears in the title, og:title, the nav logo and the footer. -->
+  <title>Jetyard: manage self-hosted NATS without the CLI</title>
+  <meta name="description" content="Open-source dashboard for NATS you run yourself: streams, consumers, KV, accounts, users and monitoring. One docker run, AGPL-3.0.">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Jetyard: manage self-hosted NATS without the CLI">
+  <meta property="og:description" content="Open-source dashboard for NATS you run yourself: streams, consumers, KV, accounts, users and monitoring. One docker run.">
+  <!-- og:image needs an absolute URL once the domain is live, e.g. https://example.com/assets/og.png -->
+  <meta property="og:image" content="assets/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <!-- Privacy-friendly analytics: uncomment once the domain is live.
+  <script defer data-domain="example.com" src="https://plausible.io/js/script.js"></script>
+  -->
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0e1a;
+      --surface: #111827;
+      --surface-2: #0d1322;
+      --border: rgba(255, 255, 255, 0.08);
+      --accent: #6366f1;
+      --accent-2: #8b5cf6;
+      --cyan: #22d3ee;
+      --green: #34d399;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --radius: 14px;
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    a { color: var(--cyan); }
+    code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+
+    .wrap { max-width: 1080px; margin: 0 auto; padding: 0 1.5rem; }
+    section { padding: 5rem 0; }
+
+    /* Nav */
+    nav {
+      position: sticky; top: 0; z-index: 10;
+      background: rgba(10, 14, 26, 0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+    nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+    .logo { font-weight: 700; font-size: 1.15rem; color: #fff; text-decoration: none; letter-spacing: -0.3px; }
+    .logo span { color: var(--cyan); }
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.95rem; }
+    .nav-links a:hover { color: var(--text); }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.7rem 1.3rem; border-radius: 10px;
+      font-weight: 600; font-size: 0.95rem; text-decoration: none;
+      border: 1px solid transparent; cursor: pointer; transition: background 0.2s, border-color 0.2s;
+    }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: var(--accent-2); }
+    .btn-ghost { border-color: var(--border); color: var(--text); background: transparent; }
+    .btn-ghost:hover { border-color: rgba(255, 255, 255, 0.25); }
+    .btn[disabled] { opacity: 0.55; cursor: not-allowed; }
+
+    /* Hero */
+    .hero { padding: 6rem 0 3rem; text-align: center; }
+    .badge {
+      display: inline-block; margin-bottom: 1.5rem; padding: 0.3rem 0.9rem;
+      border: 1px solid rgba(34, 211, 238, 0.3); border-radius: 999px;
+      color: var(--cyan); font-size: 0.85rem;
+    }
+    h1 { font-size: clamp(2.3rem, 6vw, 4rem); line-height: 1.1; letter-spacing: -1.5px; color: #fff; margin-bottom: 1.25rem; }
+    h1 em { font-style: normal; background: linear-gradient(90deg, var(--cyan), var(--accent)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .lead { font-size: 1.2rem; color: var(--muted); max-width: 640px; margin: 0 auto 2.25rem; }
+    .hero-actions { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; }
+    .hero-note { margin-top: 1.25rem; color: var(--muted); font-size: 0.9rem; }
+
+    h2 { font-size: clamp(1.7rem, 3.5vw, 2.3rem); letter-spacing: -0.6px; color: #fff; margin-bottom: 0.75rem; }
+    .section-lead { color: var(--muted); max-width: 640px; margin-bottom: 2.5rem; }
+    .center { text-align: center; }
+    .center .section-lead { margin-left: auto; margin-right: auto; }
+
+    /* Screenshots */
+    .shots { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.5rem; }
+    .shots > *, .shots-row > * { min-width: 0; }
+    .shot {
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .shot img { display: block; width: 100%; height: auto; border-bottom: 1px solid var(--border); }
+    .shot figcaption { padding: 1rem 1.25rem; }
+    .shot figcaption strong { color: #fff; display: block; margin-bottom: 0.15rem; }
+    .shot figcaption span { color: var(--muted); font-size: 0.95rem; }
+    .shots-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1.5rem; }
+    @media (max-width: 760px) { .shots-row { grid-template-columns: minmax(0, 1fr); } }
+
+    /* Install */
+    .terminal {
+      background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius);
+      overflow: hidden; text-align: left; max-width: 760px; margin: 0 auto 1.5rem;
+    }
+    .terminal-bar {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0.6rem 1rem; border-bottom: 1px solid var(--border); color: var(--muted); font-size: 0.85rem;
+    }
+    .terminal pre { padding: 1.25rem; overflow-x: auto; font-size: 0.92rem; line-height: 1.7; color: var(--text); }
+    .terminal .c { color: var(--muted); }
+    .copy { background: none; border: 1px solid var(--border); color: var(--muted); border-radius: 6px; padding: 0.2rem 0.7rem; cursor: pointer; font-size: 0.8rem; }
+    .copy:hover { color: var(--text); }
+    .install-steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; max-width: 760px; margin: 0 auto 2rem; text-align: left; }
+    .install-steps div { color: var(--muted); font-size: 0.95rem; }
+    .install-steps b { color: #fff; display: block; }
+    @media (max-width: 760px) { .install-steps { grid-template-columns: 1fr; } }
+
+    /* Team edition */
+    .team {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.12), rgba(34, 211, 238, 0.06));
+      border: 1px solid rgba(99, 102, 241, 0.3); border-radius: 20px; padding: 3rem;
+      display: grid; grid-template-columns: 1.1fr 1fr; gap: 3rem; align-items: start;
+    }
+    @media (max-width: 860px) { .team { grid-template-columns: 1fr; padding: 2rem; } }
+    .team ul { list-style: none; display: grid; gap: 0.6rem; margin-top: 1.5rem; }
+    .team li { padding-left: 1.6rem; position: relative; }
+    .team li::before { content: "→"; position: absolute; left: 0; color: var(--cyan); }
+    .team li span { color: var(--muted); }
+    form { display: grid; gap: 1rem; }
+    label { font-size: 0.9rem; color: var(--muted); display: grid; gap: 0.4rem; }
+    input, select {
+      width: 100%; padding: 0.75rem 0.9rem; border-radius: 10px;
+      border: 1px solid var(--border); background: var(--surface-2); color: var(--text); font-size: 1rem;
+    }
+    input:focus, select:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+    .form-note { font-size: 0.85rem; color: var(--muted); }
+    .form-status { font-size: 0.95rem; min-height: 1.4em; }
+    .form-status.ok { color: var(--green); }
+    .form-status.err { color: #f87171; }
+
+    /* Footer */
+    footer { border-top: 1px solid var(--border); padding: 2.5rem 0; color: var(--muted); font-size: 0.9rem; }
+    footer .wrap { display: flex; justify-content: space-between; gap: 1.5rem; flex-wrap: wrap; }
+    footer a { color: var(--muted); }
+    footer a:hover { color: var(--text); }
+    .footer-links { display: flex; gap: 1.25rem; }
+    .trademark { width: 100%; font-size: 0.8rem; opacity: 0.8; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a class="logo" href="#">Jet<span>yard</span></a>
+    <div class="nav-links">
+      <a href="#install">Install</a>
+      <a href="#team">Team edition</a>
+      <a class="btn btn-ghost" href="https://github.com/imadMansour85/Jetyard">GitHub</a>
+    </div>
+  </div>
+</nav>
+
+<!-- 1. Message -->
+<header class="hero">
+  <div class="wrap">
+    <span class="badge">Open source · AGPL-3.0 · Self-hosted</span>
+    <h1>Manage <em>self-hosted NATS</em><br>without the CLI</h1>
+    <p class="lead">Streams, consumers, KV, accounts, users and monitoring, in one dashboard you run yourself, next to your NATS servers.</p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="#install">Install in one command</a>
+      <a class="btn btn-ghost" href="https://github.com/imadMansour85/Jetyard">View on GitHub</a>
+    </div>
+    <p class="hero-note">Free. No license key, no sign-up, no telemetry.</p>
+  </div>
+</header>
+
+<!-- 2. Screenshots -->
+<section>
+  <div class="wrap">
+    <div class="shots">
+      <figure class="shot">
+        <img src="assets/streams.png" alt="Streams page listing JetStream streams with message counts, size, storage and retention" width="1440" height="880" loading="lazy">
+        <figcaption><strong>Streams, consumers and messages</strong><span>Create and delete streams, see what each consumer has pending, publish and browse messages.</span></figcaption>
+      </figure>
+      <div class="shots-row">
+        <figure class="shot">
+          <img src="assets/accounts.png" alt="Accounts page with NATS accounts signed by your operator" width="1440" height="880" loading="lazy">
+          <figcaption><strong>Accounts and users</strong><span>Issue accounts and users with publish/subscribe permissions and download their .creds, without nsc.</span></figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="assets/server.png" alt="Server Info page with CPU, memory, connections and JetStream usage" width="1440" height="880" loading="lazy">
+          <figcaption><strong>Monitoring</strong><span>CPU, memory, connections, message rates and JetStream limits, live.</span></figcaption>
+        </figure>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 3. Install -->
+<section id="install" class="center">
+  <div class="wrap">
+    <h2>Running in under two minutes</h2>
+    <p class="section-lead">One container, pointed at the NATS server you already have. JetStream and the monitoring port (<code>-m 8222</code>) must be enabled.</p>
+
+    <div class="terminal">
+      <div class="terminal-bar"><span>bash</span><button class="copy" type="button" data-copy="install-cmd">Copy</button></div>
+<pre id="install-cmd">docker run -d -p 3000:3000 \
+  -e NATS_URL=nats://your-nats-host:4222 \
+  -e JWT_SECRET="$(openssl rand -hex 32)" \
+  -v jetyard-data:/data \
+  ghcr.io/imadmansour85/jetyard:latest</pre>
+    </div>
+
+    <div class="install-steps">
+      <div><b>1. Run the container</b>Add <code>NATS_USER</code>/<code>NATS_PASSWORD</code> or <code>NATS_TOKEN</code> if your server needs them.</div>
+      <div><b>2. Open localhost:3000</b>Create the first admin account, then add your team's logins.</div>
+      <div><b>3. Optional: accounts</b>Set <code>OPERATOR_NKEY_SEED</code> to issue NATS accounts and users from the UI.</div>
+    </div>
+
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="https://github.com/imadMansour85/Jetyard">View on GitHub</a>
+      <a class="btn btn-ghost" href="https://github.com/imadMansour85/Jetyard/blob/main/docs/install.md">Install guide: Compose, HTTPS, upgrades</a>
+    </div>
+  </div>
+</section>
+
+<!-- 4. Team edition waitlist -->
+<section id="team">
+  <div class="wrap">
+    <div class="team">
+      <div>
+        <h2>Team edition (coming)</h2>
+        <p class="section-lead" style="margin-bottom:0">The open-source dashboard stays free. For teams that need more, we're planning:</p>
+        <ul>
+          <li>SSO <span>with your identity provider</span></li>
+          <li>Role-based access control <span>beyond admin and viewer</span></li>
+          <li>Audit log <span>of who changed what, and when</span></li>
+          <li>Alerting <span>when something needs attention</span></li>
+          <li>Multi-cluster <span>in one dashboard</span></li>
+          <li>Support <span>from the people who build it</span></li>
+        </ul>
+      </div>
+      <div>
+        <!--
+          WAITLIST: set data-endpoint to a Formspree form URL (https://formspree.io/f/xxxx),
+          a Tally/Buttondown endpoint that accepts form POSTs, or similar.
+          While it is empty, the button stays disabled and nothing is sent.
+        -->
+        <form id="waitlist" data-endpoint="" novalidate>
+          <label>Work email
+            <input type="email" name="email" required autocomplete="email" placeholder="you@company.com">
+          </label>
+          <label>Which one do you need most?
+            <select name="most_needed" required>
+              <option value="" disabled selected>Choose one</option>
+              <option>SSO</option>
+              <option>Role-based access control</option>
+              <option>Audit log</option>
+              <option>Alerting</option>
+              <option>Multi-cluster</option>
+              <option>Support</option>
+              <option>Something else</option>
+            </select>
+          </label>
+          <button class="btn btn-primary" type="submit">Tell me when it's ready</button>
+          <p class="form-status" role="status" aria-live="polite"></p>
+          <p class="form-note">One email when it launches. No newsletter, and your address isn't shared.</p>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 5. Footer -->
+<footer>
+  <div class="wrap">
+    <span>Jetyard · <a href="https://github.com/imadMansour85/Jetyard/blob/main/LICENSE">AGPL-3.0-or-later</a></span>
+    <span class="footer-links">
+      <a href="https://github.com/imadMansour85/Jetyard">GitHub</a>
+      <a href="https://github.com/imadMansour85/Jetyard/discussions">Discussions</a>
+      <a href="https://github.com/imadMansour85/Jetyard/blob/main/SECURITY.md">Security</a>
+    </span>
+    <span class="trademark">NATS is a trademark of The Linux Foundation. This project is not affiliated with or endorsed by the NATS project or The Linux Foundation.</span>
+  </div>
+</footer>
+
+<script>
+  // Copy buttons
+  document.querySelectorAll('[data-copy]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var text = document.getElementById(btn.dataset.copy).textContent;
+      navigator.clipboard.writeText(text).then(function () {
+        btn.textContent = 'Copied';
+        setTimeout(function () { btn.textContent = 'Copy'; }, 1500);
+      });
+    });
+  });
+
+  // Waitlist form: posts to data-endpoint, disabled until one is configured.
+  (function () {
+    var form = document.getElementById('waitlist');
+    var button = form.querySelector('button');
+    var status = form.querySelector('.form-status');
+    var endpoint = form.dataset.endpoint;
+
+    if (!endpoint) {
+      button.disabled = true;
+      button.textContent = 'Waitlist opens soon';
+      status.textContent = 'Meanwhile, star or watch the GitHub repo to hear about it.';
+      return;
+    }
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      status.className = 'form-status';
+      if (!form.checkValidity()) {
+        status.textContent = 'Enter your email and pick the feature you need most.';
+        status.classList.add('err');
+        return;
+      }
+      button.disabled = true;
+      status.textContent = 'Sending…';
+      fetch(endpoint, { method: 'POST', body: new FormData(form), headers: { Accept: 'application/json' } })
+        .then(function (r) {
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          form.reset();
+          status.textContent = "You're on the list. We'll email you once, when it's ready.";
+          status.classList.add('ok');
+        })
+        .catch(function () {
+          status.textContent = "Couldn't send that. Please try again in a minute.";
+          status.classList.add('err');
+        })
+        .finally(function () { button.disabled = false; });
+    });
+  })();
+</script>
+</body>
+</html>

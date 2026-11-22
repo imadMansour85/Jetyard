@@ -1,0 +1,36 @@
+name: Feature request
+description: Suggest something the dashboard should do
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to do?
+      description: The task or problem, in your own words. What do you do today instead (nats CLI, nsc, scripts)?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What would help
+      description: How you imagine it working. Screenshots or sketches welcome.
+  - type: dropdown
+    id: scale
+    attributes:
+      label: How many people would use this in your team?
+      options:
+        - Just me
+        - 2-10
+        - 11-50
+        - More than 50
+  - type: checkboxes
+    id: team
+    attributes:
+      label: Team features
+      description: Tick any that this request is about. It helps us decide what to build next.
+      options:
+        - label: SSO / OIDC login
+        - label: Role-based access control
+        - label: Audit log
+        - label: Alerting
+        - label: Managing several NATS clusters
