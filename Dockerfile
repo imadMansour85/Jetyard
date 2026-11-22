@@ -20,7 +20,7 @@ ENV NEXT_OUTPUT=export NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 
 # ---- backend -----------------------------------------------------------------
-FROM --platform=$BUILDPLATFORM golang:1.23-alpine AS api
+FROM --platform=$BUILDPLATFORM golang:1.26-alpine AS api
 ARG TARGETOS TARGETARCH
 ARG VERSION=dev
 ARG COMMIT=""
