@@ -254,11 +254,10 @@
       </div>
       <div>
         <!--
-          WAITLIST: set data-endpoint to a Formspree form URL (https://formspree.io/f/xxxx),
-          a Tally/Buttondown endpoint that accepts form POSTs, or similar.
-          While it is empty, the button stays disabled and nothing is sent.
+          WAITLIST: sign-ups go to Formspree (form xnpdonny). Each one arrives as an email
+          from Formspree and in its dashboard, with CSV export. Empty data-endpoint = disabled.
         -->
-        <form id="waitlist" data-endpoint="" novalidate>
+        <form id="waitlist" data-endpoint="https://formspree.io/f/xnpdonny" novalidate>
           <label>Work email
             <input type="email" name="email" required autocomplete="email" placeholder="you@company.com">
           </label>
@@ -274,9 +273,12 @@
               <option>Something else</option>
             </select>
           </label>
+          <!-- Formspree: subject of the alert email you receive, and a spam trap that bots fill in and people never see. -->
+          <input type="hidden" name="_subject" value="Jetyard Team edition: new waitlist sign-up">
+          <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true" style="display:none">
           <button class="btn btn-primary" type="submit">Tell me when it's ready</button>
           <p class="form-status" role="status" aria-live="polite"></p>
-          <p class="form-note">One email when it launches. No newsletter, and your address isn't shared.</p>
+          <p class="form-note">One email when it launches. No newsletter, and your address isn't shared. It is stored by <a href="https://formspree.io/legal/privacy-policy/">Formspree</a> on our behalf, only for this.</p>
         </form>
       </div>
     </div>
